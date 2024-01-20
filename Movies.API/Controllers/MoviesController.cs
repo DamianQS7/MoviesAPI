@@ -30,13 +30,15 @@ public class MoviesController : ControllerBase
         MovieResponse response = movie.MapToMovieResponse();
 
         // return the URL for the location of the new resource, and the new resource.
-        return Created($"{EndPoints.Movies.Create}/{response.Id}", response);
+        return CreatedAtAction(nameof(GetMovieById), new { idOrSlug = response.Id }, response);
     }
 
     [HttpGet(EndPoints.Movies.Get)]
-    public async Task<IActionResult> GetMovieById([FromRoute] Guid id)
+    public async Task<IActionResult> GetMovieById([FromRoute] string idOrSlug)
     {
-        Movie? movie = await _movieRepo.GetByIdAsync(id);
+        Movie? movie = Guid.TryParse(idOrSlug, out Guid id)
+                    ? await _movieRepo.GetByIdAsync(id)
+                    : await _movieRepo.GetBySlugAsync(idOrSlug);
 
         if (movie is null)
             return NotFound();
@@ -53,5 +55,30 @@ public class MoviesController : ControllerBase
         var response = movies.MapToMoviesResponse();
 
         return Ok(response);
+    }
+
+    [HttpPut(EndPoints.Movies.Update)]
+    public async Task<IActionResult> Update([FromRoute] Guid id,
+        [FromBody] UpdateMovieRequest request)
+    {
+        var movie = request.MapToMovie(id);
+        var isUpdated = await _movieRepo.UpdateAsync(movie);
+
+        if (!isUpdated)
+            return NotFound();
+
+        var response = movie.MapToMovieResponse();
+        return Ok(movie);
+    }
+
+    [HttpDelete(EndPoints.Movies.Delete)]
+    public async Task<IActionResult> Delete([FromRoute] Guid id)
+    {
+        bool isDeleted = await _movieRepo.DeleteByIdAsync(id);
+
+        if (!isDeleted)
+            return NotFound();
+
+        return Ok();
     }
 }

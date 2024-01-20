@@ -8,7 +8,7 @@ public static class ContractMapping
 {
     public static Movie MapToMovie(this CreateMovieRequest request)
     {
-        return new Movie 
+        return new Movie
         {
             Id = Guid.NewGuid(),
             Title = request.Title,
@@ -23,6 +23,7 @@ public static class ContractMapping
         {
             Id = movie.Id,
             Title = movie.Title,
+            Slug = movie.Slug,
             YearOfRelease = movie.YearOfRelease,
             Genres = movie.Genres
         };
@@ -33,6 +34,17 @@ public static class ContractMapping
         return new MoviesResponse
         {
             Items = movies.Select(MapToMovieResponse)
+        };
+    }
+
+    public static Movie MapToMovie(this UpdateMovieRequest request, Guid id)
+    {
+        return new Movie
+        {
+            Id = id,
+            Title = request.Title,
+            YearOfRelease = request.YearOfRelease,
+            Genres = request.Genres.ToList()
         };
     }
 }
