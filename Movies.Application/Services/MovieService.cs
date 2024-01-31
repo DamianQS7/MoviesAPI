@@ -15,9 +15,10 @@ public class MovieService : IMovieService
         _movieValidator = movieValidator;
     }
 
-    public Task<bool> CreateAsync(Movie movie)
+    public async Task<bool> CreateAsync(Movie movie)
     {
-        return _movieRespository.CreateAsync(movie);
+        await _movieValidator.ValidateAndThrowAsync(movie);
+        return await _movieRespository.CreateAsync(movie);
     }
 
     public Task<bool> DeleteByIdAsync(Guid Id)
@@ -42,6 +43,8 @@ public class MovieService : IMovieService
 
     public async Task<Movie?> UpdateAsync(Movie movie)
     {
+        await _movieValidator.ValidateAndThrowAsync(movie);
+
         var movieExists = await _movieRespository.ExistsByIdAsync(movie.Id);
 
         if(!movieExists)
