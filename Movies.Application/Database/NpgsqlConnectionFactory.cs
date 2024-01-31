@@ -12,11 +12,11 @@ public class NpgsqlConnectionFactory : IDbConnectionFactory
         _connectionString = connectionString;
     }
 
-    public async Task<IDbConnection> CreateConnectionAsync()
+    public async Task<IDbConnection> CreateConnectionAsync(CancellationToken token = default)
     {
         // The consumer of this method must be the responsible of disposing this connection afterwards.
         var connection = new NpgsqlConnection(_connectionString);
-        await connection.OpenAsync();
+        await connection.OpenAsync(token);
         return connection;
     }
 }
