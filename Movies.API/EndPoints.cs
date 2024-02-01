@@ -2,8 +2,6 @@
 
 public static class EndPoints
 {
-    private const string ApiBase = "api";
-
     public static class Movies
     {
         private const string Base = "api/movies";
@@ -13,5 +11,13 @@ public static class EndPoints
         public const string GetAll = Base;
         public const string Update = $"{Base}/{{id:guid}}";
         public const string Delete = $"{Base}/{{id:guid}}";
+        public const string Rate = $"{Base}/{{id:guid}}/ratings";
+        public const string DeleteRating = $"{Base}/{{id:guid}}/ratings";
+    }
+
+    public static class Ratings
+    {
+        public const string Base = "api/ratings";
+        public const string GetUserRatingd = $"{Base}/me";
     }
 }
