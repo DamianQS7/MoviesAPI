@@ -18,6 +18,6 @@ public static class EndPoints
     public static class Ratings
     {
         public const string Base = "api/ratings";
-        public const string GetUserRatingd = $"{Base}/me";
+        public const string GetUserRatings = $"{Base}/me";
     }
 }
