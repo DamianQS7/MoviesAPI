@@ -67,18 +67,28 @@ public class MovieRepository : IMovieRepository
         """, new { id }, cancellationToken: token));
     }
 
-    public async Task<IEnumerable<Movie>> GetAllAsync(Guid? userId = default, CancellationToken token = default)
+    public async Task<IEnumerable<Movie>> GetAllAsync(GetAllMoviesOptions options, CancellationToken token = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
 
         var result = await connection.QueryAsync(new CommandDefinition("""
-            SELECT m.*, string_agg(DISTINCT g.name, ',') as genres
+            SELECT m.*, 
+                    string_agg(DISTINCT g.name, ',') as genres,
+                    ROUND(AVG(r.rating)) AS rating,
+                    myr.rating AS userrating
             FROM movies m 
             LEFT JOIN genres g ON m.id = g.movieid
             LEFT JOIN ratings r ON m.id = r.movieid
-            LEFT JOIN ratings myr ON m.id = myr.movieid AND myr.userid = @userId 
-            GROUP BY id
-        """, new { userId }, cancellationToken: token));
+            LEFT JOIN ratings myr ON m.id = myr.movieid AND myr.userid = @userId
+            WHERE (@title IS NULL OR m.title LIKE ('%' || @title || '%'))
+            AND (@yearofrelease IS NULL OR m.yearofrelease = @yearofrelease) 
+            GROUP BY id, userrating
+        """, new 
+            { 
+                userId = options.UserId,
+                title = options.Title,
+                yearofrelease = options.YearOfRelease
+            }, cancellationToken: token));
 
         return result.Select(x => new Movie
         {
