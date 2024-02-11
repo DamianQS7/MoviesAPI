@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Movies.API.Auth;
+using Movies.API.Health;
 using Movies.API.Mapping;
 using Movies.Application;
 using Movies.Application.Database;
@@ -41,10 +42,12 @@ builder.Services.AddAuthorization(x =>
         c.User.HasClaim(m => m is {Type: AuthConstants.AdminUserClaimName, Value: "true"}) || 
         c.User.HasClaim(m => m is {Type: AuthConstants.TrustedMemberClaimName, Value: "true"})));
 });
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHealthChecks().AddCheck<DatabaseHealthCheck>("Database");
 builder.Services.AddApplication();
 builder.Services.AddPostgresDatabase(configuration["Database:PostgresConnectionStr"]!);
 
@@ -57,6 +60,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.MapHealthChecks("_health");
 
 app.UseHttpsRedirection();
 

@@ -51,7 +51,7 @@ public class MoviesController : ControllerBase
         MovieResponse response = movie.MapToMovieResponse();
         return Ok(response);
     }
-
+    
     [HttpGet(EndPoints.Movies.GetAll)]
     public async Task<IActionResult> GetAllMovies(CancellationToken token,
         [FromQuery] GetAllMoviesRequest request)
