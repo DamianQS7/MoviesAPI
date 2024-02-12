@@ -43,6 +43,8 @@ builder.Services.AddAuthorization(x =>
         c.User.HasClaim(m => m is {Type: AuthConstants.TrustedMemberClaimName, Value: "true"})));
 });
 
+builder.Services.AddResponseCaching();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -67,6 +69,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+//app.UseCors();
+app.UseResponseCaching();
 
 app.UseMiddleware<ValidationMappingMiddleware>();
 app.MapControllers();
