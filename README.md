@@ -10,3 +10,4 @@ A RESTful API using ASP.NET Core 8.0. The user can perform CRUD operations on Mo
 * Sorting
 * Pagination
 * Health Checks
+* Response Caching
